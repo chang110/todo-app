@@ -1,0 +1,26 @@
+# Development mode — bind-mounts source code for hot-reload
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+services:
+  todo-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
+    container_name: todo-app-dev
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DB_PATH=/data/todo.db
+    volumes:
+      # Mount backend source for live-reload
+      - ./backend/src:/app/src
+      # Persistent SQLite database
+      - todo-data-dev:/data
+    command: node --watch src/index.js
+    restart: "no"
+
+volumes:
+  todo-data-dev:
+    driver: local
